@@ -1,0 +1,58 @@
+{
+  "jobs": [
+    {
+      "id": "ebcc84b628f0",
+      "name": "Reference update",
+      "prompt": "This is the output of tonight's reference update. If it says 'no changes', reply exactly: No new references tonight. Otherwise reply 'And I snagged new references:' followed by each line as a bullet. Nothing else.",
+      "skills": [],
+      "skill": null,
+      "model": "claude-haiku-5-5",
+      "provider": null,
+      "base_url": null,
+      "script": "reference-update.sh",
+      "no_agent": false,
+      "monitor_script": null,
+      "monitor_url": null,
+      "monitor_state": null,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 5 * * *",
+        "display": "0 5 * * *"
+      },
+      "schedule_display": "0 5 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 3
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-10-23T08:15:31.325664+00:00",
+      "next_run_at": "2026-10-26T05:00:00+00:00",
+      "last_run_at": "2026-10-25T05:00:34.082394+00:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "last_delivery_unverified": null,
+      "last_failure": null,
+      "failure_streak": 0,
+      "deliver": "discord",
+      "origin": null,
+      "enabled_toolsets": null,
+      "workdir": null,
+      "fire_claim": null,
+      "canonical_completions": [
+        "6347af459cd745bf8b2cfb2e93274099"
+      ],
+      "last_dispatch": {
+        "scheduled_at": "2026-10-25T05:00:00+00:00",
+        "dispatched_at": "2026-10-25T05:00:15.712662+00:00",
+        "lateness_seconds": 15.7,
+        "kind": "on_time"
+      }
+    }
+  ],
+  "updated_at": "2026-10-25T05:00:35.079595+00:00"
+}

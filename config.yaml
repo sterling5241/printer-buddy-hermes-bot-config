@@ -2124,3 +2124,6 @@ approvals:
     - "*/home/dev/printer-buddy* reset*"
     - "*/home/dev/printer-buddy* checkout*"
     - "*/home/dev/printer-buddy* clean*"
+onboarding:
+  seen:
+    busy_input_prompt: true

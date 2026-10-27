@@ -69,16 +69,17 @@ When the review target's stated purpose is to replace, port, or match another sy
 - Distinguish "intentional improvement" from "silent divergence." Intentional improvements are fine if documented; silent divergences break the replacement contract.
 
 Concrete recipe:
-Concrete recipe:
 ```bash
 # 1. find the merge base with the upstream
 git merge-base HEAD upstream/main  # or: origin/main, main, master
-# 2. capture the whole branch diff
+# 2. capture the whole branch diff (write under the scratch dir, not /tmp)
 git diff <merge-base>..HEAD --stat
-git diff <merge-base>..HEAD > /tmp/branch.diff
+git diff <merge-base>..HEAD > ~/.hermes/cache/scratch/branch.diff
 # 3. open the reference implementation next to it
 # (read both, compare algorithm-by-algorithm)
 ```
+
+When the reference branch has moved on since the branch forked, use the three-dot form (`reference...branch`) for the branch's own delta. See the pitfall on diverged references below.
 
 When the target merges logic from multiple Linux drivers (e.g., a U-Boot driver that combines a DSI host and its D-PHY), pull each reference file side-by-side and quote `file:line` from each one. See `references/parity-merged-reference-drivers.md`.
 
@@ -148,7 +149,12 @@ The wit lives in the delivery; the rigor lives in the substance. Every barb must
 - **A behavioral claim is a hypothesis until you run it.** When the finding is "this reads past the buffer", "this branch takes the wrong path", or "this writes to the wrong slot", extract the actual function from the repo into a small harness with stub collaborators and execute it — copy the function source at review time rather than retyping it, so the probe cannot drift from the code under review. For memory-safety claims, compile the real translation unit against the real vendored library objects under `-fsanitize=address` and quote the sanitizer report. Then put the program's output in the finding instead of describing what the code would do; "reproduced under ASan" ends the argument, "looks like it overflows" invites one. Structural reading alone has produced confident wrong reviews in both directions — false findings, and real bugs dismissed as theoretical. When the probe links the library's own translation units, supply the platform hooks it expects at link time (a widget library configured for a custom tick wants its `<lib>_tick_get` symbol); an undefined reference there is probe setup, not a finding — stub it and rerun before concluding anything about the code.
 - **Prefer the vendored source in the repo over mocks for library behavior.** When the project pins the library as a submodule, read the pinned copy (and compile against its objects) instead of reasoning from an upstream version or from memory; the pinned fork is frequently where the interesting behavior differs.
 - Default scope is the current diff, not the whole repo — UNLESS the user's framing ("as a replacement for X", "port of Y", "parity with Z") implies whole-branch. Pick the rung from the Scope Discovery table above; do not silently expand.
+- **A named branch may be gone from the remote.** If `git ls-remote` shows no such head, resolve the name through the PR list (`https://api.github.com/repos/<owner>/<repo>/pulls?state=all`, match `head.ref`), then fetch `refs/pull/<N>/head` — PR refs survive branch deletion. Report which PR and head SHA you reviewed, and that the branch name no longer exists.
+- **Diverged reference: use the three-dot diff.** A two-dot `reference..branch` diff shows the reverse of every reference commit made after the fork, so it looks like the branch deletes working code. Use `reference...branch` for the branch's own changes, and check `git merge-base --is-ancestor <branch-tip> <reference>` to see whether the work already landed on the reference (and whether the reference later removed it). See `references/feature-branch-scope-trap.md`.
+- **Exclude vendored and minified files from grep and diff output.** Minified bundles (`*.min.js`, vendored `vendor/`) are single lines of megabytes; one unfiltered `git grep` floods the capture window. Use pathspecs like `':!ui/vendor' ':!*.min.js'` on every search, and `git diff --stat` before reading hunks.
+- **No test suite in the tree is a finding to state, not a gap to hide.** When neither the branch nor the reference has tests, say so in the scope line and the verdict, and substitute a compile or import smoke test of the changed modules (`python3 -m py_compile`, `node --check`, etc.) run on an `archive` export so the working copy stays untouched.
 - **Feature-named branches can be misleading.** When the user scopes the review to a branch or feature (e.g., `cc2-dsi`), check `git diff` against the merge base. If the branch is empty or the expected driver/algorithm is not in the diff, state the mismatch and review the actual changed code (often `HEAD~1..HEAD`). See `references/feature-branch-scope-trap.md`.
+- **Security of HTTP handlers needs a request-level probe, not a read.** Check how the body parser decides the content type, whether there is any Origin or CSRF check, and which methods the allowlist exposes. A cross-site `text/plain` POST needs no preflight, so a JSON parser that ignores Content-Type is a CSRF. Probe it as described in `references/web-api-review-probes.md`.
 - **Do not use vision tools for text-based code or diff reviews.** `read_file`, `search_files`, `terminal`, and `web_extract` are the right tools for source, diffs, and documentation. Vision is reserved for screenshots, visual artifacts, CAPTCHAs, and layouts the accessibility tree cannot represent. Unnecessary `vision_analyze` calls waste time and can hit rate limits.
 - Style-only complaints (naming, formatting) should be suppressed unless they cause real harm.
 - **Do not skip running the test suite.** "I read the code carefully" is not the same as "the project builds and tests pass." Spend five minutes on `cargo test` / `pytest` / equivalent. State the result.

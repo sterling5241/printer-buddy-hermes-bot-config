@@ -19,6 +19,11 @@ Spoolman https://github.com/Donkie/Spoolman
 obico-server https://github.com/TheSpaghettiDetective/obico-server
 moonraker-obico https://github.com/TheSpaghettiDetective/moonraker-obico
 grumpyscreen https://github.com/pellcorp/grumpyscreen
+creality https://github.com/pellcorp/creality
+kalico-pellcorp https://github.com/pellcorp/kalico
+kalico-rpi https://github.com/pellcorp/kalico-rpi
+k1-kalico-firmware https://github.com/pellcorp/k1-kalico-firmware
+virtual-klipper-printer https://github.com/pellcorp/virtual-klipper-printer
 "
 changed=0
 while read -r name url; do
@@ -34,3 +39,4 @@ while read -r name url; do
   [ "$n" -gt 0 ] && echo "$name: $n new commits" && changed=1
 done <<< "$repos"
 [ "$changed" = 0 ] && echo "no changes"
+exit 0

@@ -2117,7 +2117,9 @@ approvals:
   mode: manual
   deny:
     - "*192.168.*"
-    - "*.env*"
+    - "*/.env*"
+    - "* .env*"
+    - "*printer-buddy.env*"
     - "*~/printer-buddy* reset*"
     - "*~/printer-buddy* checkout*"
     - "*~/printer-buddy* clean*"

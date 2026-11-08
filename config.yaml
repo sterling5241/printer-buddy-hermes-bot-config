@@ -69,6 +69,9 @@ plugins:
 # =============================================================================
 # Model Configuration
 # =============================================================================
+  enabled:
+    - forum-close
+  disabled: []
 model:
   # Default model to use (can be overridden with --model flag)
   # Both "default" and "model" work as the key name here.
@@ -130,7 +133,7 @@ cron:
 
 terminal:
   backend: "local"
-  cwd: "."  # For local backend: "." = current directory. Ignored for remote backends unless a backend documents otherwise.
+  cwd: "/home/dev/.hermes/work-nerd" # For local backend: "." = current directory. Ignored for remote backends unless a backend documents otherwise.
   # Desktop xterm font. Install the font locally; Nerd Fonts render Powerlevel10k glyphs.
   # font_family: "MesloLGS NF"  # Also accepts a CSS stack; blank uses bundled JetBrains Mono.
   timeout: 180
@@ -736,7 +739,7 @@ memory:
 
   # Periodic memory nudge: remind the agent to consider saving memories
   # every N user turns. Set to 0 to disable. Only active when memory is enabled.
-  nudge_interval: 10        # Nudge every 10 user turns (0 = disabled)
+  nudge_interval: 0         # Nudge every 10 user turns (0 = disabled)
 
 # =============================================================================
 # Session Continuity (Messaging Platforms)
@@ -751,7 +754,7 @@ memory:
 # top-level key takes precedence over gateway.max_concurrent_sessions. The cap
 # is a best-effort single-host/profile runtime guard; Hermes fails open if the
 # local runtime lease registry cannot be read or locked.
-  write_approval: true
+  write_approval: false
 max_concurrent_sessions:
 
 # When true, group/channel chats use one session per participant when the platform
@@ -878,7 +881,7 @@ skills:
   # Nudge the agent to create skills after complex tasks.
   # Every N tool-calling iterations, remind the model to consider saving a skill.
   # Set to 0 to disable.
-  creation_nudge_interval: 15
+  creation_nudge_interval: 0
 
   # External skill directories — share skills across tools/agents without
   # copying them into ~/.hermes/skills/.  Each path is expanded (~ and ${VAR})
@@ -892,12 +895,12 @@ skills:
 # =============================================================================
 # Agent Behavior
 # =============================================================================
-  write_approval: true
+  write_approval: false
 agent:
   # Maximum tool-calling iterations per conversation (default: 500)
   # Higher = more room for complex tasks, but costs more tokens
   # Recommended: 20-30 for focused tasks, 50-100 for open exploration
-  max_turns: 500
+  max_turns: 12
 
   # Inactivity timeout for gateway agent runs (seconds, 0 = unlimited).
   # The agent can run indefinitely when actively calling tools or receiving
@@ -1178,16 +1181,16 @@ gateway:
 #   google_chat:      hermes-google_chat      (same as telegram)
 #
 platform_toolsets:
-  cli: [hermes-cli]
-  telegram: [hermes-telegram]
-  discord: [hermes-discord]
-  whatsapp: [hermes-whatsapp]
-  slack: [hermes-slack]
-  signal: [hermes-signal]
-  qqbot: [hermes-qqbot]
-  yuanbao: [hermes-yuanbao]
-  teams: [hermes-teams]
-  google_chat: [hermes-google_chat]
+  cli: [hermes-cli, forum_close]
+  telegram: [hermes-telegram, forum_close]
+  discord: [hermes-discord, forum_close]
+  whatsapp: [hermes-whatsapp, forum_close]
+  slack: [hermes-slack, forum_close]
+  signal: [hermes-signal, forum_close]
+  qqbot: [hermes-qqbot, forum_close]
+  yuanbao: [hermes-yuanbao, forum_close]
+  teams: [hermes-teams, forum_close]
+  google_chat: [hermes-google_chat, forum_close]
 
 # =============================================================================
 # Gateway Platform Settings
@@ -2114,7 +2117,7 @@ fallback_providers:
     base_url: https://generativelanguage.googleapis.com/v1beta
 
 approvals:
-  mode: manual
+  mode: smart
   deny:
     - "*192.168.*"
     - "*/.env*"
@@ -2129,3 +2132,9 @@ approvals:
 onboarding:
   seen:
     busy_input_prompt: true
+auxiliary:
+  background_review:
+    enabled: false
+discord:
+  channel_prompts:
+    '1568770998138966066': This is the Printer Buddy support forum. Try to sort the problem out quickly, in a few short replies at most. Ask for what you need (versions, what they did, log lines) and point them to the fix. If you can not solve it in about three replies, or it is not a Printer Buddy problem, tag <@&1568771210752303224> with a short summary of what we know and what was tried, and step back. Keep replies short, and do not spend long digging. Never hand work off to a subagent here. When the poster or support says it is fixed, reply briefly, then call close_forum_post.
